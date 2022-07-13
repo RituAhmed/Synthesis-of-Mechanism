@@ -29,7 +29,8 @@ function def_mech_3D
                           '2 parallel unitary vectors',...
                           'Point aligned with an unitary vector',...
                           'Angle of an unitary vector respect to a planar basis',...
-                          'Coordinate depending on time');
+                          'Coordinate depending on time',...
+                          'Constant distance between 2 points');
                 switch op2
                     case 1 %3D_rs_3uv
                         I=imread('rs_3uv.jpg');
@@ -131,6 +132,20 @@ function def_mech_3D
                             mech=[mech;constraint];
                             n=n+1;
                         end
+                    case 8 %rs_2p
+                        I=imread('rs_2p.jpg');
+                        figure=imshow(I);
+                        title('Constant distance between 2 points')
+                        daspect([1 1 1]);
+                        dat=inputdlg({'xA','yA','zA','xB','yB','zB','LAB'},'Pointers (+ if variable, - if constant)'...
+                            ,1,{'','','','','','',''},'on');
+                        close all
+                        if 0<length(dat)
+                            dat=cstr2mn(dat);
+                            constraint=struct('constraint_class','phi_3D_rs_2p','p',dat);
+                            mech=[mech;constraint];
+                            n=n+1;
+                        end
                 end
             case 2 %Modificar
                 if 0<n
@@ -223,7 +238,7 @@ function def_mech_3D
                         elseif strcmp(constraint.constraint_class,'phi_coord_t')
                             I=imread('COORD_T.jpg');
                             figure=imshow(I);
-                            title('COORDINATE DEPENDING ON TIME')
+                            title('Coordinate depending on time')
                             daspect([1 1 1]);
                             dat=inputdlg({'x:','f_x:'},['Constraint pointer ' int2str(n)]...
                                 ,1,{num2str(constraint.p) constraint.fun},'on');
@@ -232,6 +247,19 @@ function def_mech_3D
                                 p=str2num(dat{1});
                                 fun=dat{2};
                                 constraint=struct('constraint_class','phi_coord_t','p',p,'fun',fun);
+                                mech{s}=constraint;
+                            end
+                        elseif strcmp(constraint.constraint_class,'phi_3D_rs_2p')
+                            I=imread('rs_2p.jpg');
+                            figure=imshow(I);
+                            title('Constant distance between 2 points')
+                            daspect([1 1 1]);
+                            dat=inputdlg({'xA','yA','zA','xB','yB','zB','LAB'},['Constraint pointers ' int2str(n)]...
+                                ,1,mn2cstr(constraint.p),'on');
+                            close all
+                            if 0<length(dat)
+                                dat=cstr2mn(dat);
+                                constraint=struct('constraint_class','phi_3D_rs_2p','p',dat);
                                 mech{s}=constraint;
                             end
                         end
